@@ -8,10 +8,25 @@ import {
 
 const projects = [
   {
+    name: 'The Block Capitol – Web3 Awareness & Enrollment Platform',
+    description:
+      'The Capitol is a Web3 awareness and enrollment platform designed to educate users and simplify onboarding. Built with React, Tailwind CSS, and TypeScript, it delivers a sleek, responsive, and modern experience.',
+    link: 'https://the-block-capitol.vercel.app',
+    img: {
+      src: 'https://the-block-capitol.vercel.app/main-logo.png',
+      alt: 'The Block Capitol',
+    },
+    category: [
+      { color: ColorTags.FUCHSIA, label: 'React' },
+      { color: ColorTags.LIME, label: 'Tailwind CSS' },
+      { color: ColorTags.SKY, label: 'TypeScript' },
+    ],
+  },
+  {
     name: 'PlayDen - Book Sports Venues',
     description:
       'Play Den is a mobile app platform that simplifies sports pitch bookings. With four user roles—super admin, pitch owner, manager, and player—it streamlines scheduling, management, and payments. Built with Laravel, React, and Flutter, it ensures a seamless experience across web and mobile.',
-    link: '/',
+    link: 'https://playdenapp.com/',
     img: {
       src: 'https://playdenapp.com/wp-content/uploads/2024/08/Artboard-14.png',
       alt: 'PlayDen - Book Sports Venues',
@@ -40,37 +55,6 @@ const projects = [
     ],
   },
   {
-    name: 'CheriX – Multi-User E-commerce Platform',
-    description:
-      'CheriX is a multi-user e-commerce platform that enables users to sell products while managing distributors and admins. It features an integrated wallet system, Paystack for secure payments, and SEO optimization for better visibility. Built with Laravel, Bootstrap, CSS, and JavaScript, it ensures a smooth shopping experience.',
-    link: 'https://cherix.ng',
-    img: {
-      src: '/assets/images/project-maps.png',
-      alt: 'CheriX – E-commerce Platform',
-    },
-    category: [
-      { color: ColorTags.FUCHSIA, label: 'Laravel' },
-      { color: ColorTags.LIME, label: 'Bootstrap' },
-      { color: ColorTags.SKY, label: 'CSS' },
-      { color: ColorTags.ROSE, label: 'JavaScript' },
-    ],
-  },
-  {
-    name: 'The Block Capitol – Web3 Awareness & Enrollment Platform',
-    description:
-      'The Capitol is a Web3 awareness and enrollment platform designed to educate users and simplify onboarding. Built with React, Tailwind CSS, and TypeScript, it delivers a sleek, responsive, and modern experience.',
-    link: 'https://the-block-capitol.vercel.app',
-    img: {
-      src: 'https://the-block-capitol.vercel.app/main-logo.png',
-      alt: 'The Block Capitol',
-    },
-    category: [
-      { color: ColorTags.FUCHSIA, label: 'React' },
-      { color: ColorTags.LIME, label: 'Tailwind CSS' },
-      { color: ColorTags.SKY, label: 'TypeScript' },
-    ],
-  },
-  {
     name: 'Clay Retails – Fintech Cooperative & Credit System',
     description:
       'Clay Retails is a fintech system designed for cooperatives, offering users limited monthly loans similar to a credit card system. It also issues physical and digital cards, enabling users to make purchases via card or QR code at partnered stores. Built with React, TypeScript, Tailwind CSS, and NestJS, it ensures seamless transactions and financial flexibility.',
@@ -84,6 +68,22 @@ const projects = [
       { color: ColorTags.LIME, label: 'TypeScript' },
       { color: ColorTags.SKY, label: 'Tailwind CSS' },
       { color: ColorTags.ROSE, label: 'NestJS' },
+    ],
+  },
+  {
+    name: 'CheriX – Multi-User E-commerce Platform',
+    description:
+      'CheriX is a multi-user e-commerce platform that enables users to sell products while managing distributors and admins. It features an integrated wallet system, Paystack for secure payments, and SEO optimization for better visibility. Built with Laravel, Bootstrap, CSS, and JavaScript, it ensures a smooth shopping experience.',
+    link: 'https://cherix.ng',
+    img: {
+      src: '/assets/images/project-maps.png',
+      alt: 'CheriX – E-commerce Platform',
+    },
+    category: [
+      { color: ColorTags.FUCHSIA, label: 'Laravel' },
+      { color: ColorTags.LIME, label: 'Bootstrap' },
+      { color: ColorTags.SKY, label: 'CSS' },
+      { color: ColorTags.ROSE, label: 'JavaScript' },
     ],
   },
 ];
@@ -102,7 +102,8 @@ const ProjectList = () => (
           key={index}
           name={project.name}
           description={project.description}
-          link={project.link}
+          // link={project.link}
+          link={`/projects/${index}`}
           img={project.img}
           category={
             <>
