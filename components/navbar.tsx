@@ -12,7 +12,6 @@ import {
   NotebookText,
   Sun,
   Twitter,
-  User,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -26,7 +25,7 @@ const navItems = [
   { path: "https://x.com/davidenabs", icon: Twitter },
   { path: "https://www.linkedin.com/in/davidenabs", icon: Linkedin },
 
-  { path: "/about", icon: User },
+  // { path: "/about", icon: User },
 ];
 
 export function Navbar() {
