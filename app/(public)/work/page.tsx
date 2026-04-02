@@ -24,6 +24,17 @@ interface Experience {
   description: string;
 }
 
+function htmlToText(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  try {
+    const doc = new DOMParser().parseFromString(trimmed, "text/html");
+    return (doc.body.textContent ?? "").replace(/\s+/g, " ").trim();
+  } catch {
+    return trimmed.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  }
+}
+
 export default function Work() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [experiences, setExperiences] = useState<Experience[]>([]);
@@ -113,7 +124,7 @@ export default function Work() {
                       )}
                     </div>
                     <p className="text-sm text-muted dark:text-zinc-400">
-                      {project.description}
+                      {htmlToText(project.description)}
                     </p>
                   </div>
                   <ArrowUpRight

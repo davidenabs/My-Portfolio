@@ -11,9 +11,10 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import DOMPurify from "dompurify";
 import Image from "next/image";
 import Link from "next/link";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 const fadeInUp = {
@@ -29,6 +30,20 @@ const staggerContainer = {
     },
   },
 };
+
+function htmlToText(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  try {
+    const doc = new DOMParser().parseFromString(trimmed, "text/html");
+    return (doc.body.textContent ?? "").replace(/\s+/g, " ").trim();
+  } catch {
+    return trimmed
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+}
 
 export default function Home() {
   const [experiences, setExperiences] = useState<Experience[]>([]);
@@ -104,7 +119,7 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <div>
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-                Hi, I&apos;m David 👋
+                Hi, I&apos;m David
               </h1>
               <p className="text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
                 I work with founders and businesses to build scalable products,
@@ -375,6 +390,7 @@ interface Experience {
   logo_url: string | null;
   image_url?: string | null;
   color: string | null;
+  description?: string;
 }
 
 interface Project {
@@ -412,43 +428,77 @@ function ExperienceItem({
   period,
   color,
   logo_url,
+  description,
 }: {
   company: string;
   role: string;
   period: string;
   color: string | null;
   logo_url?: string | null;
+  description?: string;
 }) {
   const safeColor = color || "bg-zinc-900";
+  const [open, setOpen] = useState(false);
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-4">
-        <div
-          className={[
-            "relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-white",
-            safeColor,
-          ].join(" ")}
-        >
-          {logo_url ? (
-            <Image
-              src={logo_url}
-              alt={company}
-              fill
-              className="object-cover"
-              sizes="48px"
-            />
-          ) : (
-            <span className="text-sm font-bold">
-              {company.trim().slice(0, 1).toUpperCase()}
-            </span>
-          )}
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div
+            className={[
+              "relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-white",
+              safeColor,
+            ].join(" ")}
+          >
+            {logo_url ? (
+              <Image
+                src={logo_url}
+                alt={company}
+                fill
+                className="object-cover"
+                sizes="48px"
+              />
+            ) : (
+              <span className="text-sm font-bold">
+                {company.trim().slice(0, 1).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <h3
+              className={[
+                "font-bold text-foreground",
+                description && description.trim().length > 0
+                  ? "cursor-pointer transition-colors hover:text-foreground/80"
+                  : "",
+              ].join(" ")}
+              onClick={
+                description && description.trim().length > 0
+                  ? () => setOpen((v) => !v)
+                  : undefined
+              }
+              aria-expanded={
+                description && description.trim().length > 0 ? open : undefined
+              }
+            >
+              {company}
+            </h3>
+            <p className="text-sm text-muted">{role}</p>
+          </div>
         </div>
-        <div className="flex flex-col">
-          <h3 className="font-bold text-foreground">{company}</h3>
-          <p className="text-sm text-muted">{role}</p>
-        </div>
+        <p className="text-sm text-muted">{period}</p>
       </div>
-      <p className="text-sm text-muted">{period}</p>
+      {description && description.trim().length > 0 && (
+        <motion.div
+          initial={false}
+          animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
+          transition={{ duration: 0.25 }}
+          className="overflow-hidden ml-15"
+        >
+          <p className="px-1 text-sm leading-relaxed text-muted">
+            {description}
+          </p>
+        </motion.div>
+      )}
     </div>
   );
 }
@@ -538,6 +588,7 @@ function ProjectCard({
 }) {
   const cover = cover_image_url || image_url;
   const safeTags = tags ?? [];
+  const descriptionText = htmlToText(description);
 
   return (
     <button
@@ -564,7 +615,11 @@ function ProjectCard({
       <div className="flex flex-col gap-2 px-2">
         <h3 className="text-xl font-bold">{title}</h3>
         {year && <p className="text-sm text-muted">{year}</p>}
-        <p className="text-sm leading-relaxed text-muted">{description}</p>
+        <p className="text-sm leading-relaxed text-muted">
+          {descriptionText.length > 100
+            ? `${descriptionText.slice(0, 100)}…`
+            : descriptionText}
+        </p>
 
         <div className="mt-2 flex flex-wrap gap-2">
           {safeTags.map((tag) => (
@@ -599,6 +654,11 @@ function ProjectSheet({
   const [activeGalleryIndex, setActiveGalleryIndex] = useState<number | null>(
     null,
   );
+  const sanitizedDescription = useMemo(() => {
+    const html = (project.description ?? "").trim();
+    if (!html) return "";
+    return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+  }, [project.description]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -710,7 +770,10 @@ function ProjectSheet({
             )}
 
             <div className="text-sm leading-relaxed text-muted">
-              {project.description}
+              <div
+                className="rich-content"
+                dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+              />
             </div>
 
             {tags.length > 0 && (

@@ -8,6 +8,8 @@ import { Plus, Trash2, Edit2 } from "lucide-react";
 import { ImageUpload, MultiImageUpload } from "@/components/admin/image-upload";
 import { TagInput } from "@/components/admin/tag-input";
 import { LinksInput, ProjectLink } from "@/components/admin/links-input";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { uploadPublicFile } from "@/lib/storage";
 
 interface Project {
   id: string;
@@ -214,18 +216,24 @@ export default function ProjectsAdmin() {
                   </div>
                 </div>
 
-                <div className="mt-4 space-y-2">
-                  <label className="text-sm font-medium">Description</label>
-                  <textarea
-                    className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-950 dark:focus:ring-white/10"
-                    value={currentProject.description}
-                    onChange={(e) =>
+                <div className="mt-4">
+                  <RichTextEditor
+                    label="Description"
+                    value={currentProject.description ?? ""}
+                    onChange={(html) =>
                       setCurrentProject({
                         ...currentProject,
-                        description: e.target.value,
+                        description: html,
                       })
                     }
-                    rows={4}
+                    onUploadImage={async (file) => {
+                      const result = await uploadPublicFile({
+                        bucket: "media",
+                        file,
+                        prefix: "projects/inline",
+                      });
+                      return result.publicUrl;
+                    }}
                   />
                 </div>
               </section>
